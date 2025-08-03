@@ -1,66 +1,48 @@
-#include <Servo.h>
-Servo servo1;
-const int trigPin = 12;
-const int echoPin = 11;
-long duration;
-int distance=0;
-int potPin = A0;
-int soil=0;
-int fsoil;
-int maxDryValue=1; //this value decides how much humidity require to treat waste as wet object
-int Ultra_Distance=15; //set Distance between Ultrasonic and moisture(soil) sensor in cm
-void setup()
-{
-Serial.begin(9600);
-pinMode(trigPin, OUTPUT);
-pinMode(echoPin, INPUT);
-servo1.attach(8);
-Serial.println("Soil Sensor Ultrasonic Servo");
-}
-void loop()
-{
-int soil=0;
-for(int i=0;i<2;i++)
-{
-digitalWrite(trigPin, LOW);
-delayMicroseconds(7);
-digitalWrite(trigPin, HIGH);
-delayMicroseconds(10);
-digitalWrite(trigPin, LOW);
-delayMicroseconds(10);
-duration = pulseIn(echoPin, HIGH);
-distance= duration*0.034/2+distance;
-delay(10);
+# Smart Waste Sorter using Arduino
 
-}
-distance=distance/2;
+This project is a simple smart waste management system using Arduino. It is designed to detect and sort waste into **wet** and **dry** categories based on moisture level. It uses an ultrasonic sensor to detect the presence of waste and a soil moisture sensor to determine the type of waste. A servo motor is used to physically sort the waste into appropriate bins.
 
-if (distance <Ultra_Distance && distance>1)
-{
-delay(1000);
-for(int i=0;i<3;i++)
-{
-soil = analogRead(potPin) ;
-soil = constrain(soil, 485, 1023);
-fsoil = (map(soil, 485, 1023, 100, 0))+fsoil;
-delay(75);
-}
-fsoil=fsoil/3;
+# Components used:
+* Arduino Uno 
+* Ultrasonic Sensor (HC-SR04)
+* Soil Moisture Sensor (Analog)
+* Servo Motor (SG90 or equivalent)
+* Breadboard and jumper wires
 
-Serial.print("Humidity: ");
-Serial.print(fsoil);
-Serial.print("%"); Serial.print(" Distance: ");Serial.print(distance);Serial.print(" cm");
-if(fsoil>maxDryValue)
-{delay(1000);
-Serial.println(" ==>WET Waste ");
-servo1.write(170);
-delay(3000);}
-else{ delay(1000);
-Serial.println(" ==>Dry Waste ");
-servo1.write(10);
-delay(3000);}
+# How It Works
 
-servo1.write(90);}
-distance=0;
-fsoil=0;delay(1000);
-}
+1. The ultrasonic sensor detects the presence of waste by measuring distance.
+2. If an object is within a defined range, the soil moisture sensor is activated.
+3. Moisture readings are collected and averaged.
+4. If the moisture level is above a certain threshold, the waste is classified as **wet**, otherwise as **dry**.
+5. The servo motor rotates accordingly to sort the waste into the correct bin.
+6. After sorting, the servo motor resets to its original position.
+
+# Moisture Calibration
+
+The project uses `maxDryValue = 1` as the threshold for deciding between dry and wet waste.
+The soil sensor readings are mapped and constrained for consistent behavior.
+The system averages multiple readings to reduce error.
+
+# Code Overview
+
+* The main code is written in Arduino C/C++.
+* `pulseIn()` is used to read distance from the ultrasonic sensor.
+* `analogRead()` is used to measure moisture values.
+* The servo motor is controlled using the `Servo` library and responds to the moisture condition.
+
+# How to Run
+
+1. Connect all components as per the circuit.
+2. Upload the `.ino` file to the Arduino board using the Arduino IDE.
+3. Open the Serial Monitor to view sensor values and waste classification.
+4. Test the system by placing different types of waste in front of the ultrasonic sensor.
+
+# Future Improvements
+
+ Add visual indicators like LEDs or a display screen
+ Use a more precise moisture sensor
+ Extend the project to include IoT features (e.g., data logging, cloud integration)
+ Create a physical bin system with multiple compartments
+
+
